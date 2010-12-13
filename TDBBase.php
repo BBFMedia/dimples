@@ -17,6 +17,8 @@ class TDBBase
   public $_where = '';
   public $_groupBy = '';
   public $AutoPageLoad = false;
+ 
+ 
   
   function GetSelect()
   {
@@ -66,8 +68,12 @@ class TDBBase
 
    foreach ($this->_activeJoins as $item)
    {
-       
-       $join .= ' LEFT JOIN '. $item['table'].' '.$item['alias'] .' ON ' .$item['on'];
+       // the on actualy does not work because of no singular convertion
+       if (empty($item['on'])  )
+         $item['on'] =  '`'.$this->getTable().'`.`'. $item['table'].'`_id = `'. $item['table'].'`.`id` ';
+       if (empty($item['type']))
+           $item['type'] = 'LEFT';
+       $join .= ' '.$item['type'].' JOIN '. $item['table'].' '.$item['alias'] .' ON ' .$item['on'];
    }
    return   $join;
   }  
@@ -102,6 +108,11 @@ if (!empty($where))
    }
    return '';
   }  
+  function findFirst($where)
+  {
+  $this->find($where);
+  return $this->next();
+  }
   function find($where)
   {
   if ((preg_match('/[ ]/',$where) ) or (empty($where)))
@@ -125,6 +136,8 @@ if (!empty($where))
    
  
   $this->_data = GetTable($sql,true);
+  return $this; 
+  
   }
   function nextPage()
   {
@@ -187,9 +200,25 @@ if (!empty($where))
    } 
   return $this->getCurrentData();
   }
-  function join($joinName)
+  function join($join)
   {
-  $this->_activeJoins[] = $this->_joins[$joinName];
+  if (!is_array($join))
+    $join = array($join);
+    
+  if (!isset($join['table'])  )
+    {
+    foreach($join as $joinname)
+    $this->_activeJoins[] = $this->_joins[$joinname]; 
+    }
+    else
+    {
+     $this->_activeJoins[] = $join; 
+    }
+  
+    
+    
+    
+ 
 
   return $this;
   }
@@ -214,12 +243,13 @@ if (!empty($where))
   {
   $rs = DoSQL($sql);
   return  mysql_insert_id();
-  ;
+  
   }
   function query($sql,$fieldnames=false,$doID = false)
   {
   $rs = GetTable($sql,$fieldnames,$doID);
   return $rs;
   }
+  
 }
 ?> 

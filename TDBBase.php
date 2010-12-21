@@ -128,13 +128,13 @@ if (!empty($where))
   $sql .= ' '.$this->GetFrom();
   $sql .= ' '. $this->GetJoin();
   $sql .= ' '. $this->GetWhere( $this->_where);
-  $sql .= ' '. $this->GetOrderBy();
   $sql .= ' '. $this->GetGroupBy();
+  $sql .= ' '. $this->GetOrderBy();
   $sql .= ' '. $this->GetLimit();
 
    $this->_index  = -1;
    
- 
+
   $this->_data = GetTable($sql,true);
   return $this; 
   

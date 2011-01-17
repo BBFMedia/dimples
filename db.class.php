@@ -32,10 +32,10 @@ public static function getInstance() {
 $hosturi = DIMPLE_DB_URI; // for mysql
 // $hosturi = 'sqlite:'.$hostname ; // for sqlite
 ///***  username ***/
-$username = DIMPLE_DB_USER;
+$username = DIMPLE_DB_USERNAME;
 
 ///***  password ***/
-$password = DIMPLE_DB_PASS;
+$password = DIMPLE_DB_PASSWORD;
 
 
 

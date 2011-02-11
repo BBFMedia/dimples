@@ -1,5 +1,5 @@
 <?php
-
+require_once "db.class.php";
 class TDBBase
 {
      private $_data = null;

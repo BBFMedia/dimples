@@ -1,4 +1,29 @@
 <?php
+global $plural_rules;
+$plural_rules = array( '/(x¦ch¦ss¦sh)$/' => '\1es', # search, switch, fix, box, process, address
+'/series$/' => '\1series',
+'/([^aeiouy]¦qu)ies$/' => '\1y',
+'/([^aeiouy]¦qu)y$/' => '\1ies', # query, ability, agency
+'/(?:([^f])fe¦([lr])f)$/' => '\1\2ves', # half, safe, wife
+'/sis$/' => 'ses', # basis, diagnosis
+'/([ti])um$/' => '\1a', # datum, medium
+'/person$/' => 'people', # person, salesperson
+'/man$/' => 'men', # man, woman, spokesman
+'/child$/' => 'children', # child
+'/(.*)status$/' => '\1statuses',
+'/s$/' => 's', # no change (compatibility)
+'/$/' => 's'
+);
+function getplural($word) {
+$result = $word;
+global $plural_rules;
+foreach($plural_rules as $pattern=> $repl) {
+$result = preg_replace ($pattern, $repl, $word);
+if ($result!= $word) break; // leave if plural found
+}
+return $result;
+}
+
 require_once "db.class.php";
 class TDBBase
 {
@@ -238,8 +263,51 @@ class TDBBase
          $this -> _groupBy = $group;
          return $this;
          }
-    
-     function update($sql)
+    function createInsert($data)
+        {
+            $sql = 'INSERT INTO  '.$this->getTable().' set ';
+            foreach($data as $key => $item)
+            {//mysql_real_escape_string
+                $sql .= ' `'.$key.'` = "'.($item).'" ,';
+            }
+            $sql = trim($sql,',');
+            return $sql;
+        }
+    function createUpdate($data)
+        {
+        $names = ' ';
+        $val = '  ';
+
+        foreach($data as $key => $item)
+            {//mysql_real_escape_string
+                $names .= ' `'.$key.'`  ,';
+                $val = '  "'.($item).'" ,';
+            }
+        $names = trim($names,',');
+        $val = trim($val,',');
+        $sql = 'UPDATE  '.$this->getTable().' ( '.$names.' ) values ( '.$val.' )';
+
+        return $sql;
+        }
+    function insert($data)
+    {
+        $sql = $this->createInsert($data);
+        return $this->update($sql);
+
+    }
+    function save($data)
+    {
+        $sql = $this->createUpdate($data);
+        $this->update($sql);
+
+    }
+    function Describe()
+    {
+     $sql = 'DESCRIBE '.$this->getTable();
+     $data = $this->query($sql,true);
+      return $data;    
+    }
+    function update($sql)
     {
          $effectedRows = db::exec($sql);
          return db::lastInsertId();

@@ -263,31 +263,29 @@ class TDBBase
          $this -> _groupBy = $group;
          return $this;
          }
-    function createInsert($data)
-        {
-            $sql = 'INSERT INTO  '.$this->getTable().' set ';
-            foreach($data as $key => $item)
+    function createFieldList($data)
+    {
+             foreach($data as $key => $item)
             {//mysql_real_escape_string
                 $sql .= ' `'.$key.'` = "'.($item).'" ,';
             }
             $sql = trim($sql,',');
+        return $sql;
+    }
+    function createInsert($data)
+        {
+
+            $sql = $this->createFieldList($data);
+            $sql = 'INSERT INTO  '.$this->getTable().' set ';
+
             return $sql;
         }
     function createUpdate($data)
         {
-        $names = ' ';
-        $val = '  ';
+        $sql = $this->createFieldList($data);
+        $sql = 'UPDATE  '.$this->getTable().' SET '.$sql;
 
-        foreach($data as $key => $item)
-            {//mysql_real_escape_string
-                $names .= ' `'.$key.'`  ,';
-                $val = '  "'.($item).'" ,';
-            }
-        $names = trim($names,',');
-        $val = trim($val,',');
-        $sql = 'UPDATE  '.$this->getTable().' ( '.$names.' ) values ( '.$val.' )';
-
-        return $sql;
+            return $sql;
         }
     function insert($data)
     {

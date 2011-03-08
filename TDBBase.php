@@ -8,7 +8,7 @@ $plural_rules = array( '/(x¦ch¦ss¦sh)$/' => '\1es', # search, switch, fix, box, 
 '/sis$/' => 'ses', # basis, diagnosis
 '/([ti])um$/' => '\1a', # datum, medium
 '/person$/' => 'people', # person, salesperson
-'/man$/' => 'men', # man, woman, spokesman
+'/man$/' => 'men', # man, woman, spokesman 
 '/child$/' => 'children', # child
 '/(.*)status$/' => '\1statuses',
 '/s$/' => 's', # no change (compatibility)

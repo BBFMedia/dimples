@@ -12,8 +12,7 @@ $plural_rules = array( '/(x¦ch¦ss¦sh)$/' => '\1es', # search, switch, fix, box, 
 '/child$/' => 'children', # child
 '/(.*)status$/' => '\1statuses',
 '/s$/' => 's', # no change (compatibility)
-'/$/' => 's'
-);
+'/$/' => 's' 
 function getplural($word) {
 $result = $word;
 global $plural_rules;

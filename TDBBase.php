@@ -276,7 +276,7 @@ class TDBBase
         {
 
             $sql = $this->createFieldList($data);
-            $sql = 'INSERT INTO  '.$this->getTable().' set ';
+            $sql = 'INSERT INTO  '.$this->getTable().' set '.$sql;
 
             return $sql;
         }

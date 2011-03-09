@@ -42,7 +42,7 @@ class TDBBase
      public $_where = '';
      public $_groupBy = '';
      public $AutoPageLoad = false;
-    
+     public $_lastInsertId = -1;
     
     
      function GetSelect()
@@ -308,9 +308,14 @@ class TDBBase
     function update($sql)
     {
          $effectedRows = db::exec($sql);
-         return db::lastInsertId();
+		 $this->_lastInsertId = db::lastInsertId();
+         return $effectedRows;
         
          }
+  function lastInsertId()
+  {
+  return $this->_lastInsertId ;
+  }
      function query($sql, $usefieldnames = false, $idaskey = false)
     {
 

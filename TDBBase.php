@@ -23,6 +23,16 @@ if ($result!= $word) break; // leave if plural found
 }
 return $result;
 }
+function can_load($class)
+{
+if (function_exists('can_auto_load'))
+{
+$file = can_auto_load($class);
+if(file_exists($file))
+  require_once($file);
+}
+return class_exists($class);
+}
 
 require_once "db.class.php";
 class TDBBase
@@ -280,10 +290,10 @@ class TDBBase
 
             return $sql;
         }
-    function createUpdate($data)
+    function createUpdate($data,$where)
         {
         $sql = $this->createFieldList($data);
-        $sql = 'UPDATE  '.$this->getTable().' SET '.$sql;
+        $sql = 'UPDATE  '.$this->getTable().' SET '.$sql .' where '.$where;
 
             return $sql;
         }
@@ -293,9 +303,9 @@ class TDBBase
         return $this->update($sql);
 
     }
-    function save($data)
+    function save($data,$where)
     {
-        $sql = $this->createUpdate($data);
+        $sql = $this->createUpdate($data,$where);
         $this->update($sql);
 
     }

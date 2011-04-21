@@ -191,15 +191,16 @@ function limit($offset, $limit, $AutoPageLoad = 0)
  // if ($AutoPageLoad != -1)
 $this -> AutoPageLoad = $AutoPageLoad;
  return $this;
- }
+}
+
 function page($page, $pageSize, $AutoPageLoad = 0)
 {
  $limit = $pageSize;
- $offset = ($page - 1) * $pagesize;
+ $offset = ($page - 1) * $pageSize;
  return limit($offset, $limit, $AutoPageLoad);
 
 
- }
+}
 function ReturnAll()
 {
  return $this -> _data;
@@ -276,6 +277,7 @@ function group($group)
 
 function createFieldList($data)
 {
+    $sql = '';
      foreach($data as $key => $item)
     {//mysql_real_escape_string
         $sql .= ' `'.$key.'` = "'.($item).'" ,';
@@ -343,7 +345,7 @@ function query($sql, $usefieldnames = false, $idaskey = false)
 
      throw new TException('Invalid query: ' . $rs -> errorInfo());
      }
- if($rs === false) return $false;
+ if($rs === false) return false;
 
  $rr = array();
 
@@ -379,6 +381,10 @@ else
 // slBug(array_merge(array($fields),$rr), 'Data '.($exetime) .' secs', FirePHP::TABLE);
 return $rr;
 }
-
+function escape($str)
+{
+    $slashed = addslashes($str);
+    return $slashed;
+}
 }
 ?> 

@@ -8,7 +8,7 @@ $plural_rules = array( '/(x�ch�ss�sh)$/' => '\1es', # search, switch, fix,
 '/sis$/' => 'ses', # basis, diagnosis
 '/([ti])um$/' => '\1a', # datum, medium
 '/person$/' => 'people', # person, salesperson
-'/man$/' => 'men', # man, woman, spokesman 
+'/man$/' => 'men', # man, woman, spokesman
 '/child$/' => 'children', # child
 '/(.*)status$/' => '\1statuses',
 '/s$/' => 's', # no change (compatibility)
@@ -42,7 +42,7 @@ class TDBBase
 {
      private $_data = null;
      private $_index = -1;
-    
+
      public $_id = 'id';
      public $_overRideSelect = '';
      public $_joins = array();
@@ -56,8 +56,8 @@ class TDBBase
      public $_groupBy = '';
      public $AutoPageLoad = false;
      public $_lastInsertId = -1;
-    
-    
+
+
 function GetSelect()
 {
     if (empty($this -> _overRideSelect))
@@ -197,7 +197,7 @@ function page($page, $pageSize, $AutoPageLoad = 0)
 {
  $limit = $pageSize;
  $offset = ($page - 1) * $pageSize;
- return limit($offset, $limit, $AutoPageLoad);
+ return $this->limit($offset, $limit, $AutoPageLoad);
 
 
 }
@@ -319,7 +319,7 @@ function Describe()
 {
 $sql = 'DESCRIBE '.$this->getTable();
 $data = $this->query($sql,true);
-return $data;    
+return $data;
 }
 
 function update($sql)
@@ -387,4 +387,4 @@ function escape($str)
     return $slashed;
 }
 }
-?> 
+?>

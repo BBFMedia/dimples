@@ -146,14 +146,30 @@ function GetSelect()
      return '';
      }
 
-     function findFirst($where)
+     function findFirst($where,$lazy = false)
     {
-     $this -> find($where);
+     $this -> find($where,$lazy);
      return $this -> next();
      }
 
-    function find($where)
+    function find($where,$lazy = false)
     {
+    
+     $sql = $this->buildsql($where,false);
+     $this -> _data = $this->query($sql, true,false,$lazy );
+     return $this;
+
+ }
+    function tableCount($where)
+    {
+    
+     $sql = $this->buildsql($where,true);
+     $count = $this->query($sql, false);
+     return $count[0][0];
+
+ }
+ function buildsql($where,$count = false)
+ {
      if ((preg_match('/[ ]/', $where)) or (empty($where)))
         {
      }
@@ -162,21 +178,30 @@ else
      $where = $this -> getTable() . '.' . $this -> _id . ' = "' . $where . '"';
      }
  $this -> _where = $where;
- $sql = $this -> GetSelect();
+ if ($count)
+       {     
+       $sql = 'select count(*) ';
+       }
+       else
+       {
+       $sql = $this -> GetSelect();
+       } 
  $sql .= ' ' . $this -> GetFrom();
  $sql .= ' ' . $this -> GetJoin();
  $sql .= ' ' . $this -> GetWhere($this -> _where);
  $sql .= ' ' . $this -> GetGroupBy();
+ if (!$count)
+       {     
+
  $sql .= ' ' . $this -> GetOrderBy();
  $sql .= ' ' . $this -> GetLimit();
-
+}
  $this -> _index = -1;
 
 
- $this -> _data = $this->query($sql, true);
- return $this;
-
+return $sql;
  }
+
 function nextPage()
 {
 
@@ -318,12 +343,15 @@ $this->update($sql);
 function Describe()
 {
 $sql = 'DESCRIBE '.$this->getTable();
-$data = $this->query($sql,true);
+$data = $this->query($sql,true,false,true);
 return $data;
 }
 
-function update($sql)
+function update($sql,$lazy = false)
 {
+ if ($lasy )
+ $effectedRows = db::lazy_exec($sql);
+else
  $effectedRows = db::exec($sql);
          $this->_lastInsertId = db::lastInsertId();
  return $effectedRows;
@@ -334,11 +362,21 @@ function lastInsertId()
 return $this->_lastInsertId ;
 }
 
-function query($sql, $usefieldnames = false, $idaskey = false)
-{
+function query($sql, $usefieldnames = false, $idaskey = false,$lazy = false)
+{  
+
+slBug($sql, 'SQL'.($lazy?' Lazy':''));
+
+
+
  $exetime = microtime();
- $rs = db::prepare($sql);
+ if ($lasy )
+     $rs = db::lazy_prepare($sql);
+     else
+     $rs = db::prepare($sql);
  $rs -> execute();
+ $exetime = microtime() -  $exetime ;
+
  if(!$rs)
 {
      echo $sql;
@@ -378,7 +416,7 @@ else
       }
      }
 // fb('Trace Label', FirePHP::TRACE);
-// slBug(array_merge(array($fields),$rr), 'Data '.($exetime) .' secs', FirePHP::TABLE);
+ slBug(array_merge(array($fields),$rr), 'Data '.($exetime) .' secs', FirePHP::TABLE);
 return $rr;
 }
 function escape($str)

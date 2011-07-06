@@ -353,7 +353,7 @@ function update($sql,$lazy = false)
  $effectedRows = db::lazy_exec($sql);
 else
  $effectedRows = db::exec($sql);
-         $this->_lastInsertId = db::lastInsertId();
+      $this->_lastInsertId = db::lastInsertId();
  return $effectedRows;
  }
 

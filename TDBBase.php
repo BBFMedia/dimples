@@ -1,10 +1,10 @@
 <?php
 global $plural_rules;
-$plural_rules = array( '/(x�ch�ss�sh)$/' => '\1es', # search, switch, fix, box, process, address
+$plural_rules = array( '/(x?ch?ss?sh)$/' => '\1es', # search, switch, fix, box, process, address
 '/series$/' => '\1series',
-'/([^aeiouy]�qu)ies$/' => '\1y',
-'/([^aeiouy]�qu)y$/' => '\1ies', # query, ability, agency
-'/(?:([^f])fe�([lr])f)$/' => '\1\2ves', # half, safe, wife
+'/([^aeiouy]?qu)ies$/' => '\1y',
+'/([^aeiouy]?qu)y$/' => '\1ies', # query, ability, agency
+'/(?:([^f])fe?([lr])f)$/' => '\1\2ves', # half, safe, wife
 '/sis$/' => 'ses', # basis, diagnosis
 '/([ti])um$/' => '\1a', # datum, medium
 '/person$/' => 'people', # person, salesperson

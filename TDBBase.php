@@ -1,10 +1,10 @@
 <?php
 global $plural_rules;
-$plural_rules = array( '/(x¦ch¦ss¦sh)$/' => '\1es', # search, switch, fix, box, process, address
+$plural_rules = array( '/(xÂ¦chÂ¦ssÂ¦sh)$/' => '\1es', # search, switch, fix, box, process, address
 '/series$/' => '\1series',
-'/([^aeiouy]¦qu)ies$/' => '\1y',
-'/([^aeiouy]¦qu)y$/' => '\1ies', # query, ability, agency
-'/(?:([^f])fe¦([lr])f)$/' => '\1\2ves', # half, safe, wife
+'/([^aeiouy]Â¦qu)ies$/' => '\1y',
+'/([^aeiouy]Â¦qu)y$/' => '\1ies', # query, ability, agency
+'/(?:([^f])feÂ¦([lr])f)$/' => '\1\2ves', # half, safe, wife
 '/sis$/' => 'ses', # basis, diagnosis
 '/([ti])um$/' => '\1a', # datum, medium
 '/person$/' => 'people', # person, salesperson
@@ -364,12 +364,29 @@ class TDBBase
         return $this -> update($sql);
         } 
     
-    function save($data, $where)
+    function saveEntity(&$data)
     
     {
-        $sql = $this -> createUpdate($data, $where);
-        $this -> update($sql);
-        } 
+    
+   if (!empty($data['id']))
+    {
+ 
+    $sql = $this->createUpdate($data,'id = '.$data['id'] )   ;
+
+    }
+    else
+    {
+    
+    $owner = $data['owner']?$data['owner']:$data['owner_guid'];
+    unset($data['owner']);
+    unset($data['owner_guid']);
+    $data['id'] = $this->createEntity($this->getTable(),$owner);
+    $sql = $this->createinsert($data)   ;
+     }
+
+    $this->update($sql); 
+       
+ }                         
     
     function Describe()
     
@@ -400,7 +417,7 @@ class TDBBase
     
     {
         
-        slBug($sql, 'SQL' . ($lazy?' Lazy':''));
+      //  slBug($sql, 'SQL' . ($lazy?' Lazy':''));
         
         
         
@@ -451,14 +468,23 @@ class TDBBase
                 } 
             } 
         // fb('Trace Label', FirePHP::TRACE);
-        slBug(array_merge(array($fields), $rr), 'Data ' . ($exetime) . ' secs', FirePHP :: TABLE);
+      //  slBug(array_merge(array($fields), $rr), 'Data ' . ($exetime) . ' secs', FirePHP :: TABLE);
         return $rr;
         } 
     function escape($str)
     
     {
          $slashed = addslashes($str);
-         return $slashed;
-        } 
+         return $slashed;	
+        }
+
+function createEntity($entity_type,$owner=0)
+{
+    // pullGuid($owner);
+     $owner = $owner?$owner:'0';
+     $this->update('insert into entities  set owner_guid = '.$owner.' ,entity_type = "'.$entity_type.'"');
+     return  $this->lastInsertId();  
+}
+		
     } 
 ?>

@@ -68,15 +68,10 @@ function updateVars($guid ,$data)
         $this->update($sql);
     }
 }
-function createEntity($entity_type,$owner=0)
-{
-    pullGuid($owner);
-     $this->update('insert into entities  set owner_guid = '.$owner.' ,entity_type = "'.$entity_type.'"');
-return  $this->lastInsertId();  
-}
+
 function deleteEntity(&$entity)
 {
-        pullGuid($entity);
+     pullGuid($entity);
      $this->update('delete from entities  where guid ='.$entity);
 
 

@@ -1,10 +1,16 @@
 <?php
 
+/**
+*  relations model class
+* @package Dimples
+*
+*/
 
-class TDBRelations extends TDBBase {
+class TDBRelations extends TDBEntities {
   public $_table = ' relations';
     public $_joins = array(
-                 'entities' => array('table'=> 'entities','on'=>'entities.guid = relations.guid_b','select' => array('entity_type')) ,
+                 'entities' => array('table'=> 'entities','on'=>'entities.guid = relations.guid_b') ,
+                 'revEntities' => array('table'=> 'entities','on'=>'entities.guid = relations.guid_a') ,
                         );
 function addRelation($guid1 , $guid2 , $relationship)
 {
@@ -18,33 +24,48 @@ $this->update('delete from relations where  guid_a = '.$guid1.' and guid_b = '.$
         relationship = "'.$relationship.'"');
 }
 
+function removeAllRelations($guid1 , $guid2 )
+{
+ $this->update('delete from relations where  guid_a = '.$guid1.' and guid_b = '.$guid2.' ');
+}
 
 
-
-function getRelations($guid, $relationship,$direction = '1t2')
+function getRelations($guid, $relationship,$entity_type = null)
 {
 
 $this->join('entities');
 
-if ($direction = '1t2')
- $this->find('guid_a = '.$guid.' and  relationship = "'.$relationship.'" ');
-/*if ($direction = '2t1')
- $this->find('guid2 = '.$guid.' and  relationship = "'.$relationship.'" ');
-if ($direction = 'bi')
- $this->find(('guid2 = '.$guid.' or  guid2 = '.$guid.') and  relationship = "'.$relationship.'" ');
-  */
+ $sql = ' guid_a = '.$guid.' and  relationship = "'.$relationship.'" ';
+ 
+if  (!empty($entity_type)) 
+   $sql .= ' and entities.entity_type = "'.$entity_type.'" ';
+  
+  $this->find($sql);
+}
+function getRevRelations($guid, $relationship,$entity_type = null)
+{
+
+$this->join('revEntities');
+
+$sql = ' guid_b = '.$guid.' and  relationship = "'.$relationship.'" ';                     
+ 
+if  (!empty($entity_type)) 
+   $sql .= ' and entities.entity_type = "'.$entity_type.'" ';
+ 
+ 
+
+  $this->find($sql);
  
 }
-
 function next()
 {
- $data = parent::next();
- 
+ $data = parent::next();                                        
+
  if (empty($data))
     return null;
  
  
- $result = $this->getEntity($data['guid_b']);
+ $result = $this->getEntity($data);
  
  
  return array_merge($result,$data);
@@ -53,17 +74,5 @@ function next()
  
  
 }
-static function getEntity($guid)
-{
 
- $db = new TDBBase();
- $rs = $db->query('select * from entities where guid = '.$guid,true);
- $result = $rs[0];
- 
- 
- $rs = $db->query('select * from '.$result['entity_type'].' where id = '.$guid,true);
- 
- return array_merge($rs[0],$result);
-
-}
 }

@@ -1,116 +1,125 @@
 <?php
 
 
-require_once "TDBBase.php";
+/**
+* Entity model class
+* @package Dimples
+*
+*/
+ 
+
+/********************       
+* array('entity_type'=>"users",         
+*      'search_field'=>"username",     
+*      "title_field"=>"username",      
+*      "public_fields"=>"username",    
+*      "entity_name"=>"User",          
+*      "entity_name_plural"=>"Users" );    
+*                                      
+*****************************/
+
 
 class TDBEntities extends TDBBase
 {
-function nextEntity()
+
+static  $entity_types = array();
+
+public $entityjoin =  array('table'=> 'entities','on'=>'entities.guid = relations.guid_b');
+
+
+static function getSchema($entity_type)
 {
-$tableData = array();
-if (get_class($this)=='TDBEntities')
-{
-$entityData = $this->next();
- if ($entityData == false)
-     return false;
-$classname = 'TDB'.ucfirst(getplural($entityData['entity_type']));
-    if(class_exists( $classname ))
-    {
-        $db = new $classname();
-        $tableData = $db->findFirst('guid ='.$this->guid);
-    }
+ return   self::$entity_types[$entity_type];
 }
-else
+static function addSchema($schema)
 {
- $tableData = $this->next();
- if ($tableData == false)
-     return false;
- $dbEntities = new TDBEntities();
- $entityData = $dbEntities->findFirst('guid ='.$tableData['guid']);
+  self::$entity_types[$schema['entity_type']] = $schema;
 }
 
-$entity_type = 'T'.ucfirst($entityData['entity_type']);
-if (can_load($entity_type))
-    $entity = new $entity_type();
-  else
-    $entity = new TEntity();
-
-$vars = $this->loadvars($entityData['guid']);
-$data =  $entityData + $vars + $tableData;
-$entity->setData($data);
-
-return $entity;
-
-}
-
-function getEntity($guid)
+function search($entity_type,$search)
 {
- $this->find('id = '.$guid);
- return $this->nextEntity();
-}
-function loadvars($guid)
-{
- $sql = 'select `name`,`value` from entities_values where guid = '.$guid;
-   $data = $this->query($sql,true);
- $result = array();
-   foreach($data as $item)
-   {
-       $result[$item['name']] = $item['value'];
-   }
- return $result;
-}
-function updateVars($guid ,$data)
-{
-    unset($data['guid']);
-    foreach($data as $key => $item)
-    {
-        $sql = 'replace into entities_values  (`guid` ,`name` ,`value`) values ("'.$guid.'" ,  "'.$key.'" ,  "'.$item.'" )';
-        $this->update($sql);
-    }
-}
-
-function deleteEntity(&$entity)
-{
-     pullGuid($entity);
-     $this->update('delete from entities  where guid ='.$entity);
-
-
-}
-}
-
-class TDBConnections extends TDBEntities
-{
-function getConnections($entity,$con_type='',$direction = 'B')
-{
-pullGuid($entity);
-switch($direction){
-    case 'B':
-$sql =  'select * from connections where  ( conFrom=  "'.$entity .'" or conTo=  "'. $entity.'" )';
-  break;
-    case 'F':
-$sql =  'select * from connections where  ( conFrom=  "'.$entity .'" )';
-  break;
-    case 'T':
-$sql =  'select * from connections where  ( conTo=  "'.$entity .'" )';
-  break;
-}
-
-if (!empty($con_type))
-  $sql .=  ' and  connection="'.$con_type.'" ' ;
+  $schema = $this->getSchema( $entity_type);
   
-$this->join('entity')->find($sql);
+  $sql = 'select id , '.$schema['title_field'].'  from '.$entity_type.' 
+      left join entities on entities.guid = '.$entity_type.'.id   
+       where  '
+          .$schema['search_field'].' like "%'.$this->escape($search).'%"';
 
-
-
-}
-function makeConnection($connection, $connectFrom, $connectTo,$direction ='B')
-{
-pullGuid($connectFrom);
-pullGuid($connectTo);
+  $data = $this->query($sql,true);
+  foreach($data as $key => $item)
+     {
+      $data[$key]['search_text'] = $item[$schema['title_field']];
+      $data[$key]['entity_type'] = $entity_type;
+     }
+  return $data;
+  
+ }   
+    function saveEntity(&$data)
     
-$sql = 'replace into conections  set connection="'.$connection.'" , conFrom=  "'.$connectFrom .'",conTo=  "'. $connectTo.'" ';
-$this->execute($sql);    
+    {
+    
+   if (!empty($data['id']))
+    {
+ 
+    $sql = $this->createUpdate($data,'id = '.$data['id'] )   ;
+
+    }
+    else
+    {
+    
+    $owner = $data['owner']?$data['owner']:$data['owner_guid'];
+    unset($data['owner']);
+    unset($data['owner_guid']);
+    $data['id'] = $this->createEntity(strtolower($this->getTable()),$owner);
+    $sql = $this->createinsert($data)   ;
+     }
+
+   
+
+    $this->update($sql); 
+   return $data['id'];    
+ } 
+ 
+static function getEntity($guid)
+{
+ $db = new TDBBase();
+
+ if (!is_array($guid))
+   {
+     $rs = $db->query('select * from entities where guid = '.$guid,true);
+     $guid = $rs[0];
+    }
+ 
+ 
+ $rs = $db->query('select * from '.$guid['entity_type'].' where id = '.$guid['guid'],true);
+ 
+ return array_merge($rs[0],$guid);
+
 }
+ function createEntity($entity_type,$owner=0)
+{
+  
+     
+     
+     $this->update('insert into entities  set owner_guid = '.$owner.' ,entity_type = "'.$entity_type.'"');
+     return  $this->lastInsertId();  
 }
 
-?>
+function owner($guid)
+{
+  $db = new TDBBase();
+
+ if (!is_array($guid))
+   {
+     $rs = $db->query('select guid, owner_guid from entities where guid = '.$guid,true);
+     $guid = $rs[0];
+     var_dump($rs);
+    }
+ 
+ 
+ return $ $guid['owner_guid'];
+
+ }
+ }
+ 
+

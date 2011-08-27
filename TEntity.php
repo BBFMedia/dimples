@@ -1,130 +1,137 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Adrian
- * Date: Mar 9, 2011
- * Time: 3:59:58 PM
- * To change this template use File | Settings | File Templates.
- */
-require_once 'TDBBase.php';
- 
-function pullGuid(&$entity)
-{
- if (!is_numeric($entity))
-    {
-     $entity = $entity->guid;
-    }
-   return $entity;
-}
-class TEntity
-{
- private $vars = array();
+
+
+class TEntity {
+
+ private $orgData =array();
  private $changed = array();
- private $isNew = 1;
- public $entity_type = 'default';
-// public $guid = 0;
- public function setData($data)
- {
- $this->isNew = 0;
- $this->vars = $data;
- }
- public function getView($viewtype = '')
- {
-     return $this->entity_type.ucfirst($viewtype).'View';
- }
- public function save()
- {
-    if (count($this->changed) == 0)
-     return;
 
-
-    $classname = 'TDB'.ucfirst(getplural($this->entity_type)); // cast the entity type to the model name
-    if(class_exists( $classname ))
-    {
-        $db = new $classname();
-        $entyman = $db;
-        // remove hard fields from the soft fields
-        $fields = $db->Describe();
-        foreach ($fields as $field)
-        {
-        if (isset($this->changed[$field['Field']]))
-        {
-            $data[$field['Field']] = $this->changed[$field['Field']];
-            unset($this->changed[$field['Field']]);
-        }
-        }
-    }
-    else
-    {
-       $db = null;   //if no model then use the generic entity model
-       $entyman = new TDBEntities();
-       $data = array();
-    }
-  if ($this->isNew)
-  {
-   $this->guid = $entyman->createEntity($this->entity_type,$this->owner);  // create an entry in the entity table
-if( isset($db))
+function setData($data)
 {
-   $data['guid'] = $this->guid;
+  $this->orgData = $data;
+}
 
-   $id = $db->insert($data);          // save hard values to entity types table
-  }
-   $this->isNew = 0;
-   }
-   else
-     {
-    if(( isset($db)) and  (count($data) > 0))
-     $db->save($data,'guid = '.$this->guid);
-     //$db->saveValues($this->changed);  // save soft values
-
-     }
-$entyman->updateVars($this->guid,$this->changed);  // save soft values
-
-$this->vars =  $this->vars +  $this->changed + $data;
-$this->changed = array();
- }
-
-
-
- public function __set($index, $value)
+public function __set($index, $value)
  {
       if ($this-> __get($index) <>  $value)
 	$this->changed[$index] = $value;
  }
 
- public function __get($index)
+public function __get($index)
  {
      if (isset($this->changed[$index]))
        return $this->changed[$index];
 
-     return $this->vars[$index];
+     return $this->orgData[$index];
  }
- function load()
+
+ function loadMetaData()
  {
-    $classname = 'TDB'.ucfirst(getplural($this->entity_type));
+
+       $db = new TDBMetaData()  ;
+       
+       $rs = $db->getMetaData( $this->guid);
+       if (!empty($rs ))
+         $this->orgData = $rs + $this->orgData ;
+
+    
+ }
+ function getTable()
+ {
+    return (getplural(subStr(get_class($this),1,1000)));
+ 
+ }
+ function getDBClass()
+ {
+    return 'TDB'.ucfirst($this->getTable());
+ 
+ }
+ function load($guid)
+ {
+      $classname = $this->getDBClass();
+ 
     if(class_exists( $classname ))
     {
         $db = new $classname();
-        $data = $db->findFirst('guid ='.$this->guid);
-        if (!empty($data))
-         $this->vars = $this->vars + $data;
-        if (!empty($this->vars))
-         $this->vars = $data;
+      
     }
+    else
+      {
+      $db =new TDBEntities();
+     // $db->_table =  $this->getTable();
+      }
+     $data = $db->getEntity($guid);
+
+     $this->setData($data);
+     $this->loadMetaData();
+ return $rs;
  }
- public function getConnetions($con_type = '')
+ protected function save()
  {
- $db = new TDBConnections();
-  return $db->getConnections($this,$con_type);
+ 
+ 
+   $classname = $this->getDBClass();
+ 
+   if(class_exists( $classname ))
+    {
+        $db = new $classname();
+      
+    }
+    else
+      {
+      $db =new TDBEntities();
+      $db->_table =  $this->getTable();
+      }
+      
+   $tfields = $db->describe();
+   $fields = array();
+   foreach($tfields as $field)
+      {
+      $fields[$field['Field']] = $field;
+      }
+   $metaChanges = array();
+   $tableChanges = array();
+   
+   unset($this->changed['guid']);
+   unset($this->changed['entity_type']);
+   unset($this->changed['guid_a']);
+   unset($this->changed['guid_b']);
+   unset($this->changed['relation']);
+   unset($this->changed['owner']);
+   
+   foreach($this->changed as  $field => $item)
+    {
+     if (isset($fields[$field]))
+       {
+        $tableChanges[$field] = $item;
+       }
+       else
+       {
+        $metaChanges[$field] = $item;
+  
+       }
+       
+    }
 
- }
- public function makeConnection($connection, $connectTo,$direction = 'B')
+   if (!empty($tableChanges)) 
+   {
+    $tableChanges['id'] = $this->guid;
+    $guid = $db->saveEntity( $tableChanges);
+  
+    $this->load($guid);
+    }
+    
+   $mdb = new TDBMetaData();
+   
+   $mdb->saveMetaData($this->guid,$metaChanges);
+   
+
+ foreach($this->changed as $key => $item)
  {
- pullGuid($connectTo) ;
-
-
-  $db = new TDBConnections();
-
-  $db->makeConnection($connection, $this->guid, $connectTo,$direction);
+  $this->orgData[$key] = $item;
+ } 
+ $this->changed = array(); 
+      
  }
 }
+

@@ -1,4 +1,12 @@
 <?php
+
+
+/**
+* Base Dimples class
+* @package Dimples
+*
+*/
+
 global $plural_rules;
 $plural_rules = array( '/(x¦ch¦ss¦sh)$/' => '\1es', # search, switch, fix, box, process, address
 '/series$/' => '\1series',
@@ -71,10 +79,13 @@ class TDBBase
                  foreach($item['select'] as $sl)
                  {
                     $selects[] = $item['alias'] . '.' . $sl;
-                     } 
+                     }
+                  if ( empty($item['select']))
+                      $selects[] =   $item['alias'] . '.*';
                 } 
             $selects[] = $this -> getTable() . '.*' ;
              $select = 'SELECT ';
+      
              foreach($selects as $sl)
              {
                 $select .= $sl . ' , ';
@@ -92,7 +103,7 @@ class TDBBase
          if ($table == null)
          {
             $table = get_class($this);
-             $table = subStr($table, 3, 100);
+             $table = strtolower(subStr($table, 3, 100));
              } 
         return $table;
          } 
@@ -363,35 +374,14 @@ class TDBBase
         $sql = $this -> createInsert($data);
         return $this -> update($sql);
         } 
+                        
     
-    function saveEntity(&$data)
-    
-    {
-    
-   if (!empty($data['id']))
-    {
- 
-    $sql = $this->createUpdate($data,'id = '.$data['id'] )   ;
-
-    }
-    else
-    {
-    
-    $owner = $data['owner']?$data['owner']:$data['owner_guid'];
-    unset($data['owner']);
-    unset($data['owner_guid']);
-    $data['id'] = $this->createEntity($this->getTable(),$owner);
-    $sql = $this->createinsert($data)   ;
-     }
-
-    $this->update($sql); 
-       
- }                         
-    
-    function Describe()
+    function describe($tablename = '')
     
     {
-        $sql = 'DESCRIBE ' . $this -> getTable();
+        if (empty($tablename))
+          $tablename = $this -> getTable();
+        $sql = 'DESCRIBE ' . $tablename;
         $data = $this -> query($sql, true, false, true);
         return $data;
         } 
@@ -478,13 +468,7 @@ class TDBBase
          return $slashed;	
         }
 
-function createEntity($entity_type,$owner=0)
-{
-    // pullGuid($owner);
-     $owner = $owner?$owner:'0';
-     $this->update('insert into entities  set owner_guid = '.$owner.' ,entity_type = "'.$entity_type.'"');
-     return  $this->lastInsertId();  
-}
+
 		
     } 
 ?>

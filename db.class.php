@@ -1,10 +1,39 @@
 <?php
 
+class db_debug {
+      public $queries = array();
+     function queryCount()
+        {
+        var_dump( $this->queries);
+        return count($this->queries);
+        }  
+            }
+    
+
 class db{
 
 /*** Declare instance ***/
 private static $instance = NULL;
 private static $lazy_instance = NULL;
+private static $db_debug = null;
+ static function get_db_debug()
+  {
+  die('ddd');
+          if (empty(self::$db_debug))
+    {
+     self::$db_debug = new db_debug();
+    }
+    return self::$db_debug;
+     }
+
+static function addQuery($sql)
+{
+
+     
+   self::get_db_debug->queries[] = $sql;
+  
+}
+
 
 /**
 *

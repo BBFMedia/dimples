@@ -410,7 +410,7 @@ class TDBBase
       //  slBug($sql, 'SQL' . ($lazy?' Lazy':''));
         
         
-        
+        db::addQuery($sql);
          $exetime = microtime();
          if ($lasy)
              $rs = db :: lazy_prepare($sql);

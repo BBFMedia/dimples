@@ -389,11 +389,16 @@ class TDBBase
     function update($sql, $lazy = false)
     
     {
+            $exetime = microtime();
+ 
          if ($lasy)
              $effectedRows = db :: lazy_exec($sql);
         else
              $effectedRows = db :: exec($sql);
-         $this -> _lastInsertId = db :: lastInsertId();
+         db::addQuery($sql,$exetime);
+      if (isset($this))
+       $this -> _lastInsertId = db :: lastInsertId();
+ 
          return $effectedRows;
          } 
     
@@ -410,14 +415,14 @@ class TDBBase
       //  slBug($sql, 'SQL' . ($lazy?' Lazy':''));
         
         
-        db::addQuery($sql);
-         $exetime = microtime();
+          $exetime = microtime();
          if ($lasy)
              $rs = db :: lazy_prepare($sql);
          else
              $rs = db :: prepare($sql);
          $rs -> execute();
-         $exetime = microtime() - $exetime ;
+        db::addQuery($sql,$exetime);
+      
         
          if (!$rs)
          {
@@ -461,7 +466,7 @@ class TDBBase
       //  slBug(array_merge(array($fields), $rr), 'Data ' . ($exetime) . ' secs', FirePHP :: TABLE);
         return $rr;
         } 
-    function escape($str)
+   static function escape($str)
     
     {
          $slashed = addslashes($str);

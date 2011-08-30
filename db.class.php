@@ -6,7 +6,11 @@ class db_debug {
         {
         var_dump( $this->queries);
         return count($this->queries);
-        }  
+        }
+      function query($sql)
+        {
+          return TDBBase::query($sql,true);
+         }  
             }
     
 
@@ -18,7 +22,7 @@ private static $lazy_instance = NULL;
 private static $db_debug = null;
  static function get_db_debug()
   {
-  die('ddd');
+
           if (empty(self::$db_debug))
     {
      self::$db_debug = new db_debug();
@@ -26,12 +30,15 @@ private static $db_debug = null;
     return self::$db_debug;
      }
 
-static function addQuery($sql)
+static function addQuery($sql,$start)
 {
 
-     
-   self::get_db_debug->queries[] = $sql;
-  
+
+   $query = array(
+        'sql' => $sql,
+        'time' => (microtime() - $start)*1000
+    );
+    array_push(self::get_db_debug()->queries, $query); 
 }
 
 

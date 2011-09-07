@@ -113,11 +113,10 @@ function owner($guid)
    {
      $rs = $db->query('select guid, owner_guid from entities where guid = '.$guid,true);
      $guid = $rs[0];
-     var_dump($rs);
     }
  
  
- return $ $guid['owner_guid'];
+ return $guid['owner_guid'];
 
  }
  }

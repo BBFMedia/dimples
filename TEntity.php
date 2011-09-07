@@ -13,7 +13,7 @@ function setData($data)
 
 public function __set($index, $value)
  {
-      if ($this-> __get($index) <>  $value)
+      if (($this-> __get($index) <>  $value) or ($value == ''))
 	$this->changed[$index] = $value;
  }
 
@@ -24,7 +24,23 @@ public function __get($index)
 
      return $this->orgData[$index];
  }
+public function getFieldList($exp)
+                 {
 
+                 $result = array();
+                 foreach( $this->orgData  as $key =>$value)
+                   {
+                    if (preg_match($exp,$key,$matches))
+                      $result[ $key ] = $value;
+                   }
+                 //replace with changed is exists
+                 foreach( $this->changed  as $key =>$value)
+                   {
+                    if (preg_match($exp,$key,$matches))
+                      $result[ $key ] = $value;
+                   }
+                   return $result;
+                 }
  function loadMetaData()
  {
 

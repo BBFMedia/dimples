@@ -55,9 +55,8 @@ class TDBBase
     
      public $_id = 'id';
      public $_overRideSelect = '';
-     public $_joins = array();
      public $_activeJoins = array();
-     public $_table = null;
+
      public $_limit = -1;
      public $_offset = 1;
      public $_orderBy;
@@ -67,6 +66,24 @@ class TDBBase
      public $AutoPageLoad = false;
      public $_lastInsertId = -1;
     
+   
+     public $_table = null;
+
+
+/**
+* an array of joins. must be re delared in you inherited class with all the joins
+*  join scheme 
+*  <code>
+*  public $_joins =   array(
+      '{join_name}' => array('table'=> '{table}' ,'alias'=> '{alias}','on'=>'{on_of_join} ','select' => array({array_of_fields})) ,
+      'framestatus' => array('table'=> 'statuses' ,'alias'=> 'frame_status','on'=>'masterlists.frame_status_id = frame_status.id ','select' => array('frame_status')) ,
+              
+*  </code>
+*   frame status will create a join that look like  left join statuses frame_status on  masterlists.frame_status_id = frame_status.id
+* and adds to select   frame_status.frame_status
+*/
+     public $_joins = array();
+
     
     function GetSelect()
     
@@ -278,11 +295,17 @@ class TDBBase
     function next()
     
     {
+    
+        //if empty then now data in avalibel
          if (empty($this -> _data))
              {
             return false;
              } 
+        // inc index to next record
         $this -> _index += 1;
+        // if index is at end of data array then..
+        // 1) if AutoPageLoad then try load next page
+        // 2) if !AutoPageLoad then return false
          if ($this -> _index >= count($this -> _data))
              {
             if (($this -> AutoPageLoad) and ($this -> _limit > -1))
@@ -295,15 +318,19 @@ class TDBBase
             
              return false;
              } 
+         //else just return next record
         return $this -> getCurrentData();
          } 
     
     function join($join)
     
     {
+    
+       // if only one join as a string create an array
          if (!is_array($join))
              $join = array($join);
-        
+       
+       // if mutiple joins have been added by refenced name then added each join by name  
          if (!isset($join['table']))
              {
             foreach($join as $joinname)
@@ -311,6 +338,7 @@ class TDBBase
              } 
         else
              {
+        /// if it is a complete join decloration then add directly
             $this -> _activeJoins[] = $join;
              } 
         
@@ -319,6 +347,7 @@ class TDBBase
     function select($select)
     
     {
+         // set _overRideSelect with a new select. will not use default
          $this -> _overRideSelect = $select;
          return $this;
          } 

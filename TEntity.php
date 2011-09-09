@@ -6,24 +6,47 @@ class TEntity {
  private $orgData =array();
  private $changed = array();
 
-function setData($data)
+function setfieldData($data)
 {
-  $this->orgData = $data;
+  foreach($data as $key => $item)
+      $this->orgData[ $key] = array('data_type'=>'field', 'value'=>$item);
 }
 
 public function __set($index, $value)
  {
       if (($this-> __get($index) <>  $value) or ($value == ''))
-	$this->changed[$index] = $value;
+	$this->changed[$index]['value'] = $value;
  }
 
 public function __get($index)
  {
-     if (isset($this->changed[$index]))
-       return $this->changed[$index];
 
-     return $this->orgData[$index];
+     if (isset($this->changed[$index]['value']))
+       return $this->changed[$index]['value'];
+
+
+     return $this->orgData[$index]['value'];
  }
+public function setType($index,$type)
+ {
+ 
+ 
+     if ($this->orgData[$index]['data_type'] <> $type)
+     {
+      if (!isset( $this->changed[$index]['value'] ))
+       $this->changed[$index]['value']  = $this->orgData[$index]['value'];
+       $this->changed[$index]['data_type']  = $type;
+       }
+ } 
+public function setMeta($index,$meta)
+ {
+ 
+ 
+     if ($this->orgData[$index]['meta'] <> $meta)
+     {
+            $this->changed[$index]['meta']  = $meta;
+       }
+ } 
 public function getFieldList($exp)
                  {
 
@@ -78,7 +101,7 @@ public function getFieldList($exp)
       }
      $data = $db->getEntity($guid);
 
-     $this->setData($data);
+     $this->setfieldData($data);
      $this->loadMetaData();
  return $rs;
  }
@@ -99,12 +122,7 @@ public function getFieldList($exp)
       $db->_table =  $this->getTable();
       }
       
-   $tfields = $db->describe();
-   $fields = array();
-   foreach($tfields as $field)
-      {
-      $fields[$field['Field']] = $field;
-      }
+
    $metaChanges = array();
    $tableChanges = array();
    
@@ -117,9 +135,9 @@ public function getFieldList($exp)
    
    foreach($this->changed as  $field => $item)
     {
-     if (isset($fields[$field]))
+     if ($item['type'] == 'field')
        {
-        $tableChanges[$field] = $item;
+        $tableChanges[$field] = $item['value'];
        }
        else
        {
@@ -131,6 +149,7 @@ public function getFieldList($exp)
 
    if (!empty($tableChanges)) 
    {
+
     $tableChanges['id'] = $this->guid;
     $guid = $db->saveEntity( $tableChanges);
   
@@ -142,10 +161,10 @@ public function getFieldList($exp)
    $mdb->saveMetaData($this->guid,$metaChanges);
    
 
- foreach($this->changed as $key => $item)
- {
-  $this->orgData[$key] = $item;
- } 
+  foreach($this->changed as $key => $item)
+  {
+   $this->orgData[$key] =  array_merge( (array)$this->orgData[$key] , $item);
+  } 
  $this->changed = array(); 
       
  }

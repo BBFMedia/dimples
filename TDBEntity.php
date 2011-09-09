@@ -81,7 +81,8 @@ $this->changed = array();
        
      return $this->vars[$index];
  }
- function load()
+ 
+function load()
  {
     $classname = 'TDB'.ucfirst(getplural($this->entity_type));
     if(class_exists( $classname ))

@@ -212,12 +212,9 @@ class TDBBase
     function buildsql($where, $count = false)
     
     {
-         if ((preg_match('/[ ]/', $where)) or (empty($where)))
+         if (is_numeric($where))
              {
-            } 
-        else
-             {
-            $where = $this -> getTable() . '.' . $this -> _id . ' = "' . $where . '"';
+            $where =' '. $this -> getTable() . '.' . $this -> _id . ' = "' . $this->escape($where) . '" ';
              } 
         $this -> _where = $where;
          if ($count)

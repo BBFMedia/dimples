@@ -12,7 +12,7 @@ class db_debug {
           return TDBBase::query($sql,true);
          }  
             }
-    
+class  DBException extends PDOException{};    
 
 class db{
 
@@ -133,6 +133,18 @@ final public static function __callStatic( $chrMethod, $arrArguments ) {
 *
 */
 private function __clone(){
+}
+static function startTransaction()
+{
+ self::getInstance()->beginTransaction();
+}
+static function commit()
+{
+ self::getInstance()->commit();
+}
+static function rollback()
+{
+ self::getInstance()->rollback();
 }
 
 } /*** end of class ***/

@@ -415,8 +415,8 @@ class TDBBase
     function update($sql, $lazy = false)
     
     {
-            $exetime = microtime();
- 
+            $exetime = db::getMicroTime() ;
+    
          if ($lasy)
              $effectedRows = db :: lazy_exec($sql);
         else
@@ -441,7 +441,7 @@ class TDBBase
       //  slBug($sql, 'SQL' . ($lazy?' Lazy':''));
         
         
-          $exetime = microtime();
+          $exetime = db::getMicroTime()    ;
          if ($lasy)
              $rs = db :: lazy_prepare($sql);
          else

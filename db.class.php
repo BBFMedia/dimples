@@ -4,7 +4,6 @@ class db_debug {
       public $queries = array();
      function queryCount()
         {
-        var_dump( $this->queries);
         return count($this->queries);
         }
       function query($sql)
@@ -29,14 +28,18 @@ private static $db_debug = null;
     }
     return self::$db_debug;
      }
-
+ static	function getMicroTime() {
+		$time = microtime();
+		$time = explode(' ', $time);
+		return $time[1] + $time[0];
+	}
+	
 static function addQuery($sql,$start)
 {
-
-
+   
    $query = array(
         'sql' => $sql,
-        'time' => (microtime() - $start)*1000
+        'time' => (self::getMicroTime() - $start)*1000
     );
     array_push(self::get_db_debug()->queries, $query); 
 }

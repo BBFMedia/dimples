@@ -13,39 +13,58 @@ function setfieldData($data)
 }
 
 public function __set($index, $value)
- {
-      if (($this-> __get($index) <>  $value) or ($value == ''))
+ {   $data = $this->orgData[$index];
+ fb($data)   ;
+      if (( $data['value'] <>  $value) or ($value == ''))
+        {
+        $this->changed[$index] =   $data;
 	$this->changed[$index]['value'] = $value;
  }
+ }
+private function getData($index)
+   {
+      if (isset($this->changed[$index]))
+       return $this->changed[$index];
 
+
+     return $this->orgData[$index];
+   }
 public function __get($index)
  {
+  $data =  $this->getData($index);
+   
 
-     if (isset($this->changed[$index]['value']))
-       return $this->changed[$index]['value'];
-
-
-     return $this->orgData[$index]['value'];
+     return $data['value'];
  }
 public function setType($index,$type)
  {
  
+   $data =  $this->getData($index);
  
-     if ($this->orgData[$index]['data_type'] <> $type)
+     if ($date['data_type'] <> $type)
      {
-      if (!isset( $this->changed[$index]['value'] ))
-       $this->changed[$index]['value']  = $this->orgData[$index]['value'];
+     $this->changed[$index] = $data;
+   
        $this->changed[$index]['data_type']  = $type;
        }
  } 
 public function setMeta($index,$meta)
  {
+  $data = $this->getData($index);
+ fb($data)   ;
+      if (( $data['meta'] <>  $meta))
+        {
+        $this->changed[$index] =   $data;
+	$this->changed[$index]['meta'] = $meta;
+ } 
  
+  
+ }
+ public function getMeta($index)
+ {
+  $data = $this->getData($index);
+ return $data['meta'];
  
-     if ($this->orgData[$index]['meta'] <> $meta)
-     {
-            $this->changed[$index]['meta']  = $meta;
-       }
  } 
 public function getFieldList($exp)
                  {
@@ -70,6 +89,7 @@ public function getFieldList($exp)
        $db = new TDBMetaData()  ;
        
        $rs = $db->getMetaData( $this->guid);
+       fb($rs);
        if (!empty($rs ))
          $this->orgData = $rs + $this->orgData ;
 

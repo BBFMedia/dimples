@@ -27,14 +27,15 @@ function saveMetaData($guid,$data)
   $data_type = '';
   $value = '';
 // if (!empty($item['meta']))
-//   $meta = ' meta = "'.$this->escape($item['meta']).'" , ';
-    
- if (!empty($item['data_type']))
+  $meta = ' meta = "'.$this->escape($item['meta']).'" , ';
+ 
+
    $data_type = ' data_type = "'.$this->escape(strtolower($item['data_type'])).'" , ';
  if (isset($item['value']))
    $value = ' value = "'.$this->escape($item['value']).'" , ';
  $sql = 'replace into '.$this->_table.' set '.$data_type. $meta. $value
          .' name = "'.$this->escape($key).'" , guid = '.$this->escape($guid)
+       
            .' , last_changed = now()';
            
           

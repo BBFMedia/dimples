@@ -14,7 +14,7 @@ function setfieldData($data)
 
 public function __set($index, $value)
  {   $data = $this->orgData[$index];
- fb($data)   ;
+
       if (( $data['value'] <>  $value) or ($value == ''))
         {
         $this->changed[$index] =   $data;
@@ -62,7 +62,7 @@ public function setMeta($index,$meta)
  }
  public function getMeta($index)
  {
-  $data = $this->getData($index);
+ $data = $this->getData($index);
  return $data['meta'];
  
  } 
@@ -89,7 +89,7 @@ public function getFieldList($exp)
        $db = new TDBMetaData()  ;
        
        $rs = $db->getMetaData( $this->guid);
-       fb($rs);
+    
        if (!empty($rs ))
          $this->orgData = $rs + $this->orgData ;
 

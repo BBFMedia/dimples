@@ -57,6 +57,12 @@ function search($entity_type,$search)
     function saveEntity(&$data)
     
     {
+    $owner = $data['owner']?$data['owner']:$data['owner_guid'];
+    unset($data['guid']);
+    unset($data['owner']);
+    unset($data['owner_guid']);
+    unset($data['owner_rights']);
+    unset($data['entity_type']);
     
    if (!empty($data['id']))
     {
@@ -67,9 +73,6 @@ function search($entity_type,$search)
     else
     {
     
-    $owner = $data['owner']?$data['owner']:$data['owner_guid'];
-    unset($data['owner']);
-    unset($data['owner_guid']);
     $data['id'] = $this->createEntity(strtolower($this->getTable()),$owner);
     $sql = $this->createinsert($data)   ;
      }
@@ -108,6 +111,9 @@ static function getEntity($guid)
 function owner($guid)
 {
   $db = new TDBBase();
+ if ((is_array($guid))and (empty($guid['owner_guid'])))
+   $guid = $guid['id'];
+
 
  if (!is_array($guid))
    {

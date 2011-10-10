@@ -8,20 +8,20 @@
 */
 
 global $plural_rules;
-$plural_rules = array( '/(x¦ch¦ss¦sh)$/' => '\1es', # search, switch, fix, box, process, address
-'/series$/' => '\1series',
-'/([^aeiouy]¦qu)ies$/' => '\1y',
-'/([^aeiouy]¦qu)y$/' => '\1ies', # query, ability, agency
-'/(?:([^f])fe¦([lr])f)$/' => '\1\2ves', # half, safe, wife
-'/sis$/' => 'ses', # basis, diagnosis
-'/([ti])um$/' => '\1a', # datum, medium
-'/person$/' => 'people', # person, salesperson
+$plural_rules = array( '/(x|ch|ss|sh)$/' => '\1es', # search, switch, fix, box, process, address 
+'/series$/' => '\1series', 
+'/([^aeiouy]|qu)ies$/' => '\1y', 
+'/([^aeiouy]|qu)y$/' => '\1ies', # query, ability, agency 
+'/(?:([^f])fe|([lr])f)$/' => '\1\2ves', # half, safe, wife 
+'/sis$/' => 'ses', # basis, diagnosis 
+'/([ti])um$/' => '\1a', # datum, medium 
+'/person$/' => 'people', # person, salesperson 
 '/man$/' => 'men', # man, woman, spokesman 
-'/child$/' => 'children', # child
-'/(.*)status$/' => '\1statuses',
-'/(.*)status$/' => '\1statuses',
-'/s$/' => 's', # no change (compatibility)
-'/$/' => 's');
+'/child$/' => 'children', # child 
+'/(.*)status$/' => '\1statuses', 
+'/s$/' => 's', # no change (compatibility) 
+'/$/' => 's' 
+) ;
 
 
 function getplural($word) {
@@ -30,8 +30,10 @@ function getplural($word) {
      global $plural_rules;
      foreach($plural_rules as $pattern => $repl) {
         $result = preg_replace ($pattern, $repl, $word);
+  
          if ($result != $word) break; // leave if plural found
          } 
+         
     return $result;
     } 
 
@@ -379,7 +381,7 @@ class TDBBase
     
     {
         
-         $sql = $this -> createFieldList($data);
+         $sql = $this->createFieldList($data);
          $sql = 'INSERT INTO  ' . $this -> getTable() . ' set ' . $sql;
         
          return $sql;
@@ -388,7 +390,7 @@ class TDBBase
     function createUpdate($data, $where)
     
     {
-        $sql = $this -> createFieldList($data);
+        $sql = $this->createFieldList($data);
         $sql = 'UPDATE  ' . $this -> getTable() . ' SET ' . $sql . ' where ' . $where;
         
          return $sql;
@@ -417,7 +419,7 @@ class TDBBase
     {
             $exetime = db::getMicroTime() ;
     
-         if ($lasy)
+         if ($lazy)
              $effectedRows = db :: lazy_exec($sql);
         else
              $effectedRows = db :: exec($sql);
@@ -442,10 +444,11 @@ class TDBBase
         
         
           $exetime = db::getMicroTime()    ;
-         if ($lasy)
+         if ($lazy)
              $rs = db :: lazy_prepare($sql);
          else
              $rs = db :: prepare($sql);
+          
          $rs -> execute();
         db::addQuery($sql,$exetime);
       
@@ -470,7 +473,7 @@ class TDBBase
                      } 
                 else
                      {
-                    $rr[$arr[0]] = $arr;
+                    $rr[reset($arr)] = $arr;
                      } 
                 } 
             } 
@@ -502,4 +505,3 @@ class TDBBase
 
 		
     } 
-?>

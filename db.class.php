@@ -41,6 +41,8 @@ static function addQuery($sql,$start)
         'sql' => $sql,
         'time' => (self::getMicroTime() - $start)*1000
     );
+    if (function_exists('fb') )
+     fb($sql, 'SQL', FirePHP::LOG);
     array_push(self::get_db_debug()->queries, $query); 
 }
 

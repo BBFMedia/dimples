@@ -186,19 +186,19 @@ class TDBBase
         return '';
          } 
     
-    function findFirst($where)
+    function findFirst($where, $lazy = false)
     
     {
-         $this -> find($where);
+         $this -> find($where, $lazy);
          return $this -> next();
          } 
     
-    function find($where)
+    function find($where, $lazy = false)
     
     {
         
-         $sql = $this -> buildsql($where);
-         $this -> _data = $this -> query($sql, true, false);
+         $sql = $this -> buildsql($where, false);
+         $this -> _data = $this -> query($sql, true, false, $lazy);
          return $this;
         
          } 
@@ -419,9 +419,9 @@ class TDBBase
     {
             $exetime = db::getMicroTime() ;
     
-     /*    if ($lazy)
+         if ($lazy)
              $effectedRows = db :: lazy_exec($sql);
-        else               */
+        else
              $effectedRows = db :: exec($sql);
          db::addQuery($sql,$exetime);
       if (isset($this))
@@ -444,20 +444,22 @@ class TDBBase
         
         
           $exetime = db::getMicroTime()    ;
-      //   if ($lazy)
-        //    $rs = db :: lazy_prepare($sql);
-        // else
+    /*     if ($lazy)
+             $rs = db :: lazy_prepare($sql);
+         else   */
              $rs = db :: prepare($sql);
-         $rs -> execute();
-        db::addQuery($sql,$exetime);
-      
-        
+          
+         
          if (!$rs)
          {
             echo $sql;
             
              throw new TException('Invalid query: ' . $rs -> errorInfo());
-             } 
+             }
+        $rs -> execute();
+        db::addQuery($sql,$exetime);
+      
+          
         if ($rs === false) return false;
         
          $rr = array();

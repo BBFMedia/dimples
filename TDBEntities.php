@@ -53,18 +53,20 @@ function search($entity_type,$search)
      }
   return $data;
   
- }   
+ }  
+ 
     function saveEntity(&$data)
-    
     {
     $owner = $data['owner']?$data['owner']:$data['owner_guid'];
+    $namespace = $data['namespace'];
     unset($data['guid']);
     unset($data['owner']);
     unset($data['owner_guid']);
     unset($data['owner_rights']);
     unset($data['entity_type']);
-    
-   if (!empty($data['id']))
+    unset($data['namespace']);
+ 
+    if (!empty($data['id']))
     {
  
     $sql = $this->createUpdate($data,'id = '.$data['id'] )   ;
@@ -73,14 +75,14 @@ function search($entity_type,$search)
     else
     {
     
-    $data['id'] = $this->createEntity(strtolower($this->getTable()),$owner);
+    $data['id'] = $this->createEntity(strtolower($this->getTable()),$owner,$namespace);
     $sql = $this->createinsert($data)   ;
-     }
+    }
 
    
 
     $this->update($sql); 
-   return $data['id'];    
+    return $data['id'];    
  } 
  
 static function getEntity($guid)
@@ -99,13 +101,27 @@ static function getEntity($guid)
  return array_merge($rs[0],$guid);
 
 }
- function createEntity($entity_type,$owner=0)
+function fillNameSpace($namespace,$data)
+    {
+    $namespace = str_replace('$guid$',$id,$namespace);
+    $namespace = str_replace('$owner_guid$',$owner_guid,$namespace); 
+    return $namespace;
+    
+    }
+function createEntity($entity_type,$owner=0,$namespace = 0)
 {
   
+     if ($namespace == 0 )
+               
+        $namespace = 'owner:'.$owner;
      
-     
-     $this->update('insert into entities  set owner_guid = '.$owner.' ,entity_type = "'.$entity_type.'"');
-     return  $this->lastInsertId();  
+     $this->update('insert into entities  set  owner_guid = '.$owner.' ,entity_type = "'.$entity_type.'"');
+
+     $id =  $this->lastInsertId(); 
+     $namespace = $this->fillNameSpace($namespace,$owner,$id);
+     $this->update('update entities set namespace = "'.$namespace.'"  where guid = '.$id);
+
+     return $id  ;
 }
 
 function owner($guid)
@@ -121,7 +137,7 @@ function owner($guid)
      $guid = $rs[0];
     }
  
- 
+
  return $guid['owner_guid'];
 
  }

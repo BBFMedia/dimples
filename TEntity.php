@@ -11,7 +11,15 @@ function setfieldData($data)
   foreach($data as $key => $item)
       $this->orgData[ $key] = array('data_type'=>'field', 'value'=>$item);
 }
+function copyMetaData($entity)
+{
+ $data = $entity->orgData;
+ unset($data['guid']);
+ unset($data['owner_guid']);
 
+ $this->changed = $data + $this->orgData;
+
+}
 public function __set($index, $value)
  {   $data = $this->orgData[$index];
 

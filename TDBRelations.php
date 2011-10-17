@@ -53,7 +53,7 @@ if  (!empty($entity_type))
    $sql .= ' and entities.entity_type = "'.$entity_type.'" ';
  
  
-
+  
   $this->find($sql);
  
 }

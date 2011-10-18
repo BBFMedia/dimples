@@ -11,11 +11,15 @@ static function getEntity($guid)
           
 
 
-$entityData = self::getEntity($guid);
+$entityData = parent::getEntity($guid);
+
+
 
 
 $vars = $this->loadvars($entityData['guid']);
 $entityData =  $entityData + $vars ;
+
+
 $entity->setData($data);
 
 return $entity;

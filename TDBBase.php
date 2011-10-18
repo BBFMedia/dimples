@@ -118,11 +118,14 @@ class TDBBase
     function getTable()
     
     {
+   
          $table = $this -> _table;
+           
          if ($table == null)
          {
             $table = get_class($this);
              $table = strtolower(subStr($table, 3, 100));
+       
              } 
         return $table;
          } 
@@ -130,6 +133,8 @@ class TDBBase
     function GetFrom()
     
     {
+    
+    
          $table = $this -> getTable();
         
          return 'FROM ' . $table;

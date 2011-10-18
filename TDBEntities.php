@@ -141,6 +141,21 @@ function owner($guid)
  return $guid['owner_guid'];
 
  }
+
+ function getObject($guid)
+ {
+    
+    
+   $rs = $this->select('entity_type')->findFirst('guid = '.$guid);
+   $entity_type = $rs['entity_type']; 
+   
+   $classname = 'T'.ucfirst( $entity_type);
+   
+   $entity = new  $classname;
+   $entity->load($guid);
+   return $guid;
+ } 
+ 
  }
  
 

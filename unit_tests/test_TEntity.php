@@ -55,7 +55,6 @@ class TestTEntity extends UnitTestCase
   `entity_type` varchar(20) CHARACTER SET latin1 NOT NULL,
   `owner_guid` int(11) NOT NULL DEFAULT '0',
   `owner_rights` tinyint(1) NOT NULL DEFAULT '1',
-  `namespace` varchar(20) CHARACTER SET latin1 NOT NULL,
   PRIMARY KEY (`guid`),
   KEY `entity_type` (`entity_type`)
 ) ;

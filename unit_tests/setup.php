@@ -1,9 +1,11 @@
 <?php
 
+
 define('_SIMPLETEST_PATH_' ,'../../simpletest');
+if (!function_exists('simpletest_autorun'))
 require_once(_SIMPLETEST_PATH_.'/autorun.php');
 
- error_reporting(E_ALL  & ~E_NOTICE & ~E_WARNING);
+error_reporting(E_ALL  & ~E_NOTICE & ~E_WARNING);
 
 //define('DIMPLE_DB_URI', "sqlite::memory:");
 //define('DIMPLE_DB_USERNAME','');

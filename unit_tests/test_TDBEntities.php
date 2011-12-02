@@ -1,8 +1,8 @@
 <?php
 require_once('setup.php');
 
-require_once('../TDBBase.php');
-require_once('../TDBEntities.php');
+require_once(dirname(dirname(__FILE__)).'/TDBBase.php');
+require_once(dirname(dirname(__FILE__)).'/TDBEntities.php');
 
 class TDBEnitytest extends TDBEntities
 

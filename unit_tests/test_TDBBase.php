@@ -1,7 +1,7 @@
 <?php
 require_once('setup.php');
 
-require_once('../TDBBase.php');
+require_once(dirname(dirname(__FILE__)).'/TDBBase.php');
 
 class TDBTestbase extends TDBBase
 
@@ -47,9 +47,17 @@ class TestTDBBase extends UnitTestCase
         $db->update('insert into testbase2 ( field1,testbase_id ) values ( "trash" ,3) ');
           $data = array( 'field1' =>'apples','field2' =>'4');
         $db->insert($data);
+       
           $data = array( 'field1' =>'peach','field2' =>'9');
         $db->insert($data);
+       ///check last id
         
+        $lastid = $db->lastInsertId();
+        $this->assertNotEqual($lastid,0 );
+        $rs = $db->findFirst($lastid); 
+        $this->assertTrue($rs['field1'] == "peach");
+        
+       /// regular find        
         $db->find(' field1 = "peach"');
         $rs = $db->next();
     
@@ -128,6 +136,11 @@ class TestTDBBase extends UnitTestCase
             $c++;
           }
        $this->assertTrue($c == 2 ); 
+       
+       
+       $rs = $db->query('describe  testbase2',1);
+        $this->assertTrue($rs[0]['Field'] == 'id' ); 
+       
        $db->update('drop table testbase');
        $db->update('drop table testbase2');
          

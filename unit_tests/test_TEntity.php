@@ -3,15 +3,15 @@
 
 require_once('setup.php');
 
-require_once('../TDBBase.php');
-require_once('../TDBEntities.php');
-require_once('../TEntity.php');
-require_once('../TDBMetaData.php');
+require_once(dirname(dirname(__FILE__)).'/TDBBase.php');
+require_once(dirname(dirname(__FILE__)).'/TDBEntities.php');
+require_once(dirname(dirname(__FILE__)).'/TEntity.php');
+require_once(dirname(dirname(__FILE__)).'/TDBMetaData.php');                                
 
 class TDBEnity2tests extends TDBEntities
 
 {
-  public $_table = 'testrecords';
+  public $_table = 'enity2tests';
 function pullEntity($guid)
 {
  $rs = $this->getEntity($guid);
@@ -30,7 +30,7 @@ function pullEntity($guid)
 */
 function createObject($data)
 {
- $rs = new TTestrecord();
+ $rs = new TEnity2test();
  $rs->setFieldData($data);
  $rs->loadMetaData();
  return $rs;
@@ -39,7 +39,7 @@ function createObject($data)
 
 }
 
-class TTestrecord extends TEntity
+class TEnity2test extends TEntity
 {
         public function save()
       {
@@ -72,7 +72,7 @@ class TestTEntity extends UnitTestCase
 )";
   public $creationdata  = '
   
-   CREATE  TEMPORARY TABLE testrecords ( 
+   CREATE  TEMPORARY TABLE enity2tests ( 
 `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 `field1` TEXT NOT NULL ,
 `field2` INT NOT NULL
@@ -102,10 +102,10 @@ class TestTEntity extends UnitTestCase
       
       
 // create entities long hand       
-      $guid =  $db->createEntity('testrecords',1);
-        $db->update('insert into testrecords (id, field1 ) values ('.  $guid.' ,"bacon" ) ');
-      $guid =  $db->createEntity('testrecords',1);
-        $db->update('insert into testrecords ( id ,field1 ) values ('.  $guid.', "bacon2" ) ');
+      $guid =  $db->createEntity('enity2tests',1);
+        $db->update('insert into enity2tests (id, field1 ) values ('.  $guid.' ,"bacon" ) ');
+      $guid =  $db->createEntity('enity2tests',1);
+        $db->update('insert into enity2tests ( id ,field1 ) values ('.  $guid.', "bacon2" ) ');
  
  ///     saveEntity    create entiry  with no id
  
@@ -136,7 +136,7 @@ class TestTEntity extends UnitTestCase
  // $newentity->save();        
      $db->update('drop table meta_data');
      $db->update('drop table entities');
-      $db->update('drop table testrecords');
+      $db->update('drop table enity2tests');
       
     }
 

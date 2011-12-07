@@ -139,6 +139,12 @@ final public static function __callStatic( $chrMethod, $arrArguments ) {
 */
 private function __clone(){
 }
+
+statis function error()
+{
+return PDO::errorInfo();
+}
+
 static function startTransaction()
 {
  self::getInstance()->beginTransaction();

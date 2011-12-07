@@ -140,7 +140,7 @@ final public static function __callStatic( $chrMethod, $arrArguments ) {
 private function __clone(){
 }
 
-statis function error()
+static function error()
 {
 return PDO::errorInfo();
 }

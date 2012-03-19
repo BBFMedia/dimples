@@ -78,7 +78,7 @@ function search($entity_type,$search)
     $data['id'] = $this->createEntity(strtolower($this->getTable()),$owner,$namespace);
     $sql = $this->createinsert($data)   ;
     }
-
+     
    
 
     $this->update($sql); 
@@ -144,18 +144,30 @@ function owner($guid)
 
  function getObject($guid)
  {
-    
-    
-   $rs = $this->select('entity_type')->findFirst('guid = '.$guid);
-   $entity_type = $rs['entity_type']; 
+ // $rs = $this->getEntity($guid);
+ 
+ //  $rs = $this->createObject($rs);  
    
+ //$rs = new TProduct();
+ //$rs->setFieldData($data);
+ //$rs->loadMetaData();
+ //return $rs;    
+   $rs = $this->getEntity($guid); 
+   $data = $this->findFirst('id = '.$guid);
+   $entity_type = $rs['entity_type']; 
    $classname = 'T'.ucfirst(getSingular( $entity_type));
    
    $entity = new  $classname;
+   $entity->setFieldData($data);
    $entity->load($guid);
    return $entity;
  } 
- 
+ function nextEntity()
+ {
+  $data = $this->next();
+  $ob = $this->getObject($data['id']);
+  return $ob;
+ }
  }
  
 

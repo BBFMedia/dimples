@@ -22,7 +22,10 @@ class TEntity
  $this->isNew = 0;
  $this->vars = $data;
  }
- 
+ public function toJSON()
+ {
+ //foreach($this->vars 
+ }
  public function save()
  {
 

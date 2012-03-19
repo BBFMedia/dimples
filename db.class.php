@@ -16,8 +16,9 @@ class  DBException extends PDOException{};
 class db{
 
 /*** Declare instance ***/
-private static $instance = NULL;
-private static $lazy_instance = NULL;
+
+private static $instances = array();
+
 private static $db_debug = null;
  static function get_db_debug()
   {
@@ -66,52 +67,27 @@ private function __construct() {
 * @access public
 *
 */
-public static function getInstance() {
-
-
-///***  uri for the PDO connection  ***/
-
-$hosturi = DIMPLE_DB_URI; // for mysql
-// $hosturi = 'sqlite:'.$hostname ; // for sqlite
-///***  username ***/
-$username = DIMPLE_DB_USERNAME;
-
-///***  password ***/
-$password = DIMPLE_DB_PASSWORD;
-
-
-
-if (!self::$instance)
+public static function getInstance($instname=null) {
+ 
+if (!$instname)
+  $instname = 'default'; 
+// check is exists if not create it with defualt settings
+if (!self::$instances[$instname])
     {
-    self::$instance = new PDO($hosturi, $username, $password);;
-    self::$instance-> setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+     self::createInstance($instname ,DIMPLE_DB_URI, DIMPLE_DB_USERNAME, DIMPLE_DB_PASSWORD);
     }
-return self::$instance;
+
+return self::$instances[$instname];
+}
+public static function createInstance($instname ,$hosturi, $username, $password)
+{
+ $instance = new PDO($hosturi, $username, $password);
+ $instance-> setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+ self::$instances[$instname] =  $instance;
+
 }
 
-public static function getLazy_Instance() {
 
- if (!USE_LAZY_DB )
-   return self::getInstance();
-///***  uri for the PDO connection  ***/
-
-$hosturi = DIMPLE_DB_URI_LAZY; // for mysql
-// $hosturi = 'sqlite:'.$hostname ; // for sqlite
-///***  username ***/
-$username = DIMPLE_DB_USERNAME_LAZY;
-
-///***  password ***/
-$password = DIMPLE_DB_PASSWORD_LAZY;
-
-
-
-if (!self::$instance)
-    {
-    self::$lazy_instance = new PDO($hosturi, $username, $password);;
-    self::$lazy_instance-> setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    }
-return self::$instance;
-}
 
     /*
      * Passes on any static calls to this class onto the singleton PDO instance
@@ -120,13 +96,15 @@ return self::$instance;
      */
 final public static function __callStatic( $chrMethod, $arrArguments ) {
            
-        if (preg_match('/^lazy_(.*)/',$chrMethod,$match) )
+        if (preg_match('/^(.*)_(.*)/',$chrMethod,$match) )
          {
-           $chrMethod = $match[1];
-        $objInstance = self::getLazyInstance();
+         $instance =  $match[2];
+           $chrMethod = $match[2];
         }
         else
-           $objInstance = self::getInstance();
+           $instance =  null;
+        
+        $objInstance = self::getInstance($instance);
      
         return call_user_func_array(array($objInstance, $chrMethod), $arrArguments);
        
@@ -139,26 +117,19 @@ final public static function __callStatic( $chrMethod, $arrArguments ) {
 */
 private function __clone(){
 }
-
-static function error()
+static function startTransaction($instance = null)
 {
-return PDO::errorInfo();
+ self::getInstance($instance)->beginTransaction();
 }
-
-static function startTransaction()
+static function commit($instance = null)
 {
- self::getInstance()->beginTransaction();
+ self::getInstance($instance)->commit();
 }
-static function commit()
+static function rollback($instance = null)
 {
- self::getInstance()->commit();
-}
-static function rollback()
-{
- self::getInstance()->rollback();
+ self::getInstance($instance)->rollback();
 }
 
 } /*** end of class ***/
 
 
-?>

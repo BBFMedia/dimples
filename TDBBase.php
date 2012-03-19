@@ -112,7 +112,7 @@ class TDBBase
  {
     private $_data = null;
      private $_index = -1;
-    
+     
      public $_id = 'id';
      public $_overRideSelect = '';
      public $_activeJoins = array();
@@ -126,10 +126,12 @@ class TDBBase
      public $AutoPageLoad = false;
      public $_lastInsertId = -1;
     
-   
+     public $instance = null;
      public $_table = null;
 
-
+   function __construct() {  
+ //  parent::__construct();
+   }
 /**
 * an array of joins. must be re delared in you inherited class with all the joins
 *  join scheme 
@@ -434,7 +436,7 @@ class TDBBase
          $sql = '';
          foreach($data as $key => $item)
          { // mysql_real_escape_string
-            $sql .= ' `' . $key . '` = "' . ($item) . '" ,';
+            $sql .= ' `' . $key . '` = "' . $this->escape($item) . '" ,';
              } 
         $sql = trim($sql, ',');
         return $sql;
@@ -481,14 +483,12 @@ class TDBBase
     
     {
             $exetime = db::getMicroTime() ;
-    
-         if ($lazy)
-             $effectedRows = db :: lazy_exec($sql);
-        else
-             $effectedRows = db :: exec($sql);
+             
+             $effectedRows = db ::getInstance($this->instance)->exec($sql);
          db::addQuery($sql,$exetime);
+         
       if (isset($this))
-       $this -> _lastInsertId = db :: lastInsertId();
+       $this -> _lastInsertId = db::getInstance($this->instance)->lastInsertId ();
  
          return $effectedRows;
          } 
@@ -502,7 +502,7 @@ class TDBBase
     function query($sql, $usefieldnames = false, $idaskey = false, $lazy = false)
     
     {
-        
+     
       //  slBug($sql, 'SQL' . ($lazy?' Lazy':''));
         
         
@@ -510,7 +510,8 @@ class TDBBase
     /*     if ($lazy)
              $rs = db :: lazy_prepare($sql);
          else   */
-             $rs = db :: prepare($sql);
+         
+             $rs = db ::getInstance($this->instance)->prepare($sql);
           
          
          if (!$rs)

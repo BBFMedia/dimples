@@ -21,7 +21,8 @@ function saveMetaData($guid,$data)
  
  foreach($data as $key => $item)
  {
-
+ if ($item['data_type'] != 'field')
+  {
  $type = '';
   $meta = '';
   $data_type = '';
@@ -40,6 +41,7 @@ function saveMetaData($guid,$data)
            
           
            $this->update($sql);
- }   
+ } 
+ }  
 }
 }

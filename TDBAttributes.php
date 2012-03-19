@@ -42,16 +42,19 @@ function updateVars($guid ,$data)
     unset($data['guid']);
     $toupdate = $data;
     $fields = $db->Describe($data['entity_type']);
-        foreach ($data as $field)
+    var_dump(  $fields );
+    var_dump(  $data );
+die;      
+  foreach ($fields as $field)
         {
-        if (isset($data[$field['Field']]))
-        {
+      
             unset($data[$field['Field']]);
+        
         }
-        }
-    $cachevars = 
+ 
     foreach($data as $key => $item)
     {
+    
         $sql = 'replace into entities_values  (`guid` ,`name` ,`value`) values ("'.$guid.'" ,  "'.$key.'" ,  "'.$item.'" )';
         $this->update($sql);
     }

@@ -5,9 +5,26 @@ class TEntity {
 
  private $orgData =array();
  private $changed = array();
-
-function setfieldData($data)
+function toJSON()
 {
+ $data = $this->toArray();
+ return json_encode($data);
+}
+function toArray(){
+
+   $rs = array();
+  foreach( $this->orgData as $key => $item)
+   {
+    $rs[$key] = $item['value'] ;
+   }
+  foreach( $this->changed as $key => $item)
+   {
+    $rs[$key] = $item['value'] ;
+   }
+  return $rs; 
+ }
+function setfieldData($data)
+{              
   foreach($data as $key => $item)
       $this->orgData[ $key] = array('data_type'=>'field', 'value'=>$item);
 }
@@ -41,7 +58,7 @@ public function __get($index)
  {
   $data =  $this->getData($index);
    
-
+    
      return $data['value'];
  }
 public function setType($index,$type)
@@ -115,6 +132,9 @@ public function getFieldList($exp)
  }
  function load($guid)
  {
+   $this->orgData =array();
+$this->changed = array();
+   
       $classname = $this->getDBClass();
  
     if(class_exists( $classname ))
@@ -163,7 +183,8 @@ public function getFieldList($exp)
    
    foreach($this->changed as  $field => $item)
     {
-     if ($item['type'] == 'field')
+    
+     if ($item['data_type'] == 'field')
        {
         $tableChanges[$field] = $item['value'];
        }

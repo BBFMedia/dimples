@@ -482,13 +482,15 @@ class TDBBase
     function update($sql, $lazy = false)
     
     {
-            $exetime = db::getMicroTime() ;
-             
-             $effectedRows = db ::getInstance($this->instance)->exec($sql);
+         $exetime = db::getMicroTime() ;
+         $inst = '';
+         if (isset($this))
+            $inst = $this->instance; 
+         $effectedRows = db ::getInstance($inst)->exec($sql);
          db::addQuery($sql,$exetime);
          
-      if (isset($this))
-       $this -> _lastInsertId = db::getInstance($this->instance)->lastInsertId ();
+         if (isset($this))
+           $this -> _lastInsertId = db::getInstance($this->instance)->lastInsertId ();
  
          return $effectedRows;
          } 

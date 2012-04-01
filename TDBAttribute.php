@@ -177,7 +177,7 @@ function updateVars($guid ,$data)
 }
 function createEntity($entity_type)
 {
-return $this->update('insert into entities  set entity_type = "'.$entity_type.'"');    
+return $this->updssddate('insert into entities  set entity_type = "'.$entity_type.'"');    
 }
 function deleteEntity($guid)
 {

@@ -116,7 +116,6 @@ function createEntity($entity_type,$owner=0,$namespace = 0)
         $namespace = 'owner:'.$owner;
      
      $this->update('insert into entities  set  owner_guid = '.$owner.' ,entity_type = "'.$entity_type.'"');
-
      $id =  $this->lastInsertId(); 
      $namespace = $this->fillNameSpace($namespace,$owner,$id);
      $this->update('update entities set namespace = "'.$namespace.'"  where guid = '.$id);
@@ -168,6 +167,17 @@ function owner($guid)
   $ob = $this->getObject($data['id']);
   return $ob;
  }
+ 
+ function deleteEntity($guid)
+ {
+  db::startTransaction();
+  $this->update('delete from entities where guid = '.$this->escape($guid));
+
+  db::commit();
+   
+ 
+ }
+ 
  }
  
 

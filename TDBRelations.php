@@ -74,5 +74,13 @@ function next()
  
  
 }
-
+ function deleteEntity($guid)
+ {
+  db::startTransaction();
+  $this->update('delete from relations where guid = '.$this->escape($guid));
+  parent::deleteEntity($guid);
+  db::commit();
+   
+ 
+ }
 }

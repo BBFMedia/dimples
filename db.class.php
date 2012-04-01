@@ -18,7 +18,7 @@ class db{
 /*** Declare instance ***/
 
 private static $instances = array();
-
+private static $transactionCount = 0;
 private static $db_debug = null;
  static function get_db_debug()
   {
@@ -119,10 +119,16 @@ private function __clone(){
 }
 static function startTransaction($instance = null)
 {
+ if (self::$transactionCount == 0)
+ {
  self::getInstance($instance)->beginTransaction();
+ }
+ self::$transactionCount++;
 }
 static function commit($instance = null)
 {
+ self::$transactionCount--;
+ if (empty(  self::$transactionCount))
  self::getInstance($instance)->commit();
 }
 static function rollback($instance = null)

@@ -1,7 +1,7 @@
 <?php
 
 
-include "TDBBase.php";
+require_once "TDBBase.php";
 function pullGuid(&$entity)
 {
  if (!is_numeric($entity))

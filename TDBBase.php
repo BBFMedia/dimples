@@ -466,8 +466,11 @@ class TDBBase {
         /*     if ($lazy)
           $rs = db :: lazy_prepare($sql);
           else */
-
-        $rs = db ::getInstance($this->instance)->prepare($sql);
+       	$instance ='';
+        if(isset($this))
+		  $instance =$this->instance ;
+        
+        $rs = db ::getInstance($instance)->prepare($sql);
 
 
         if (!$rs) {

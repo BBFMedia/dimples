@@ -62,7 +62,7 @@ function search($entity_type,$search)
     unset($data['guid']);
     unset($data['owner']);
     unset($data['owner_guid']);
-    unset($data['owner_rights']);
+    unset($data['access']);
     unset($data['entity_type']);
     unset($data['namespace']);
  

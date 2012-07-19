@@ -1,26 +1,53 @@
 <?php
+/**
+* db_bug
+* a helper class for debuging.
+* Pleas note the circular reference of TDBBase
+* keeps a list of querys made to database in development
+*/
 
 class db_debug {
       public $queries = array();
+     /**
+      * db_debug::queryCount()
+      *
+      * @return integer the number of queries made
+      */
      function queryCount()
         {
         return count($this->queries);
         }
+      /**
+       * db_debug::query()
+       * a dirty way to get sql results while debuging. never use in production
+       *
+       * @param mixed $sql
+       * @return mixed
+       */
       function query($sql)
         {
           return TDBBase::query($sql,true);
-         }  
+         }
             }
-class  DBException extends PDOException{};    
+
+
+class  DBException extends PDOException{
+};
 
 class db{
 
-/*** Declare instance ***/
+/*** An array of pdo database connections ***/
 
 private static $instances = array();
 private static $transactionCount = 0;
 private static $db_debug = null;
- static function get_db_debug()
+
+/**
+ * db::get_db_debug()
+ * helper function to access db_debug class
+ * @return db_debug
+ */
+static function get_db_debug()
   {
 
           if (empty(self::$db_debug))
@@ -29,22 +56,36 @@ private static $db_debug = null;
     }
     return self::$db_debug;
      }
- static	function getMicroTime() {
+/**
+ * db::getMicroTime()
+ * get the mirco time as integer
+ * @return integer
+ */
+static	function getMicroTime() {
 		$time = microtime();
 		$time = explode(' ', $time);
 		return $time[1] + $time[0];
 	}
-	
+
+/**
+ * db::addQuery()
+ *
+ * adds a query to the db_debug class and figure time.
+ * also sends to firephp if installed
+ * @param mixed $sql
+ * @param mixed $start  the microtime the sql started.
+ *
+ */
 static function addQuery($sql,$start)
 {
-   
+
    $query = array(
         'sql' => $sql,
         'time' => (self::getMicroTime() - $start)*1000
     );
     if (function_exists('fb') )
      fb($sql, 'SQL', FirePHP::LOG);
-    array_push(self::get_db_debug()->queries, $query); 
+    array_push(self::get_db_debug()->queries, $query);
 }
 
 
@@ -68,9 +109,9 @@ private function __construct() {
 *
 */
 public static function getInstance($instname=null) {
- 
+
 if (!$instname)
-  $instname = 'default'; 
+  $instname = 'default';
 // check is exists if not create it with defualt settings
 if (!self::$instances[$instname])
     {
@@ -81,7 +122,8 @@ return self::$instances[$instname];
 }
 public static function createInstance($instname ,$hosturi, $username, $password)
 {
- $instance = new PDO($hosturi, $username, $password);
+ $instance = new PDO($hosturi, $username, $password,array(
+    PDO::ATTR_PERSISTENT => true));
  $instance-> setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
  self::$instances[$instname] =  $instance;
 
@@ -95,7 +137,7 @@ public static function createInstance($instname ,$hosturi, $username, $password)
      * @return $mix
      */
 final public static function __callStatic( $chrMethod, $arrArguments ) {
-           
+
         if (preg_match('/^(.*)_(.*)/',$chrMethod,$match) )
          {
          $instance =  $match[2];
@@ -103,11 +145,11 @@ final public static function __callStatic( $chrMethod, $arrArguments ) {
         }
         else
            $instance =  null;
-        
+
         $objInstance = self::getInstance($instance);
-     
+
         return call_user_func_array(array($objInstance, $chrMethod), $arrArguments);
-       
+
     }
 /**
 *

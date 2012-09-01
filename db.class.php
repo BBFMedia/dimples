@@ -178,6 +178,16 @@ static function rollback($instance = null)
  self::getInstance($instance)->rollback();
 }
 
+static function reset()
+{
+  self::$instances = null;  
+}
+
+static function setInstance($object, $instance="default")
+{
+  self::$instances[$instance] = $object;  
+}
+
 } /*** end of class ***/
 
 

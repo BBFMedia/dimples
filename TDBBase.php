@@ -460,7 +460,8 @@ class TDBBase {
     {
 
         //  slBug($sql, 'SQL' . ($lazy?' Lazy':''));
-
+         if (isset(db ::getInstance($instance)->mock))
+             return db ::getInstance($instance)->mockquery($sql, $usefieldnames = false, $idaskey = false, $lazy = false); 
 
         $exetime = db::getMicroTime();
         /*     if ($lazy)
@@ -472,7 +473,12 @@ class TDBBase {
         
         $rs = db ::getInstance($instance)->prepare($sql);
 
-
+        // if a pdo prepare returns an array it means it is a mockobject
+        // mock objects return right away
+        if (is_array($rs))
+        {
+            return $rs;
+        }
         if (!$rs) {
             echo $sql;
 

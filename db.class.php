@@ -123,7 +123,7 @@ return self::$instances[$instname];
 public static function createInstance($instname ,$hosturi, $username, $password)
 {
  $instance = new PDO($hosturi, $username, $password,array(
-    PDO::ATTR_PERSISTENT => true));
+    PDO::ATTR_PERSISTENT => true,PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'"));
  $instance-> setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
  self::$instances[$instname] =  $instance;
 
